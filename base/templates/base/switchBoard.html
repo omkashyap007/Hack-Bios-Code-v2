@@ -1,0 +1,306 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BlackOrdercode</title>
+  <!-- favicon -->
+<style>
+  body{
+    background-image : url("{% static 'base/backGround.jpg' %}") ;
+    height: 100%;
+    margin: 0%;
+    justify-content: center;
+    align-items: center;
+    font-family:Arial, Helvetica, sans-serif;
+  }
+  h1{
+    justify-content: center;
+    align-items: center;
+  }
+  * {
+    box-sizing: border-box;   
+
+  }
+ 
+
+/* Position text in the middle of the page/image */
+.bg-text {
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
+  color: white;
+  font-weight: bold;
+  border: 3px solid #f1f1f1;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  width: 80%;
+  padding: 20px;
+  text-align: center;
+  
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #264693;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #11181d;
+}
+
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+#main {
+
+  display: flex;
+  gap: 35px;
+  place-items: center;
+  align-items: center;
+  justify-content: center;
+  
+  
+}
+
+#main div {
+  display: flex;
+  place-items: center;
+  gap: 9px;
+}
+.footer{
+	bottom: 0;
+	position: fixed;
+	width: 100%;
+	height: 80px;
+    background-color: #f8f9fa;
+    color: #084e87;
+    text-align: center;
+}
+.footer:hover{
+	color: rgb(49, 204, 204);
+}
+.social-links {
+    justify-content: center;
+    align-items: center;
+  }
+.social-links .link-icon {
+    margin: 1rem;
+  }
+</style>
+
+
+<body>
+  <h1></h1>
+  <div class="bg-text">
+    <h1 style="font-size:50px">SwitchBoard</h1>
+    <!-- Rounded switch -->
+
+    <div id="main">
+
+    </div>
+    
+  </div>
+<!--
+<div class="footer">
+    
+    <div class="social-links">
+        <a href="" class="link-icon"><i class="fa fa-github" style="font-size:48px;"></i></a>
+    </div>
+    copyright &copy; all rights are reserved 
+    <br>
+    <br>
+</div>
+-->
+</div>
+
+</body>
+<script>
+
+  var socket = null ;
+
+  function pressFunction(div_button_id , button_number , device_type){
+    check_button = document.getElementById(div_button_id) ; 
+    state_change_value = check_button.checked ; 
+    console.log("The change state value is : " + state_change_value ) ; 
+    console.log("The button number is : " + button_number) ; 
+    if (socket != null ) {
+      socket.send(
+        JSON.stringify(
+          { 
+            "command" : "change_switch_status" , 
+            "state_change_value" : state_change_value , 
+            "button_number" : button_number ,
+            "device_type" : device_type ,
+          }
+        )
+      )
+    }
+    else { 
+      console.log("The socket is null !") ; 
+    }
+  }
+    var ws_path = "ws://" + window.location.host +"/" ; 
+    var socket = new WebSocket(ws_path) ; 
+
+    socket.onopen = function(event) { 
+      console.log("Socket is connected now !") ; 
+      socket.send(
+        JSON.stringify(
+          {
+            "command" : "join_pi_group" ,
+          }
+        )
+      )
+    }
+     
+    socket.onclose = function(event) { 
+      console.log("Socket is disconnected now !") ;  
+      socket = null ;   
+    }
+
+    socket.onmessage = function(event){ 
+      var data = JSON.parse(event.data) ;
+      console.log(data) ; 
+      var data_type = data["DATA_TYPE"]
+
+      if(data_type == "GROUP_JOINED" && data["data"] == "group_joined_successful") {
+        socket.send(
+          JSON.stringify(
+            {
+              "command": "get_switch_list" ,
+            }
+          )
+        )
+      } 
+
+      if (data_type == "SWITCH_BUTTON_LIST"){
+        var switch_list = data["switch_list_data"] ; 
+        container = document.getElementById("main") ; 
+        Object.keys(switch_list).forEach(
+        
+          device=>{
+            var button_number = switch_list[device][1] ; 
+            var device_object = switch_list[device][2] ; 
+            var device_state = switch_list[device][3] ;
+            var device_type = switch_list[device][4] ;
+            var div = document.createElement("div") ; 
+            div.style.backgroundColor = "rgb(171,214,228)" ;
+            div.style.height = 140+"px" ;
+            div.style.width = 120+"px" ;
+            div.style.display = "flex" ;
+            div.style.alignItems = "center" ;
+            div.style.justifyContent = "center" ; 
+            div.style.border = "3px solid rgba(81, 84, 68, 0.333)" ;
+            
+            var label = document.createElement("label") ; 
+            label.className = "switch" ;
+
+            var input = document.createElement("input") ; 
+            input.type = "checkbox" ; 
+            input.id = getSwichId(button_number) ; 
+            if(device_state == 1) {
+              input.checked = true ;
+            }
+            else {
+              input.checked = false ; 
+            }
+            input.addEventListener("click" , function(){
+              pressFunction(input.id , button_number , device_type) ;
+            }) ;
+             var span = document.createElement("span") ; 
+             span.className = "slider round" ; 
+
+            label.appendChild(input) ; 
+            label.appendChild(span) ; 
+
+            div.appendChild(label) ; 
+            container.appendChild(div);
+          }
+        )
+      }
+      if(data_type == "BUTTON_STATE_CHANGE"){
+        console.log("Button state change request !")
+        state_changed         = data["state_changed"] ;
+        state_change_value    = data["state_change_value"] ;
+        button_number         = data["button_number"] ;
+
+        if(state_changed){
+          var switch_id = getSwichId(button_number) ; 
+          var button_switch = document.getElementById(switch_id) ; 
+          if(state_change_value) {
+            button_switch.checked = true ; 
+          }
+          else {
+            button_switch.checked = false ; 
+          }
+          console.log(button_switch);
+        }
+      }
+
+    }
+  
+function getSwichId(button_id) { 
+  var string = "id_switch_"+button_id ; 
+  return string; 
+}
+</script>
+</html>
+
+
+
+
+      <!--
+
+      <div style="display:flex;justify-content:center;align-items:center;background-color:rgb(171, 214, 228); height: 140px; width:120px; border: 3px solid rgba(81, 84, 68, 0.333)">
+        <label class="switch">
+          <input type="checkbox" id = "id_switch_4" onclick="pressFunction('id_switch_4' , 4)">
+          <span class="slider round"></span>
+        </label>
+      </div>
+      
+    -->    

@@ -1,0 +1,1 @@
+<speech_recognition.Microphone object at 0x766d2f70>
