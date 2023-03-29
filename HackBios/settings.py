@@ -19,9 +19,9 @@ SECRET_KEY = 'django-insecure-#=sgi_vuwf@(zisa4u5r8rgi!rfg#nq0i1g_8^h#@nu7ic-0$(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*","https://7f23-103-90-97-197.in.ngrok.io" , "7f23-103-90-97-197.in.ngrok.io"]
+ALLOWED_HOSTS = ["*","https://7f23-103-90-97-197.in.ngrok.io" , "7f23-103-90-97-197.in.ngrok.io", "192.168.137.26"]
 
-CSRF_TRUSTED_ORIGINGS = ["*" , "https://*.in.ngrok.io" ,"https://7f23-103-90-97-197.in.ngrok.io"]
+# CSRF_TRUSTED_ORIGINGS = ["*" , "https://*.in.ngrok.io" ,"https://7f23-103-90-97-197.in.ngrok.io"]
 
 # Application definition
 
@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

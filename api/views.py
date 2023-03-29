@@ -9,6 +9,14 @@ import os
 
 BIOS_TOKEN = os.environ.get("BIOS_TOKEN").strip().lstrip().rstrip()
 
+devices = {
+    1 : [3 , 12 , "light" ,         gp.input(11) , "servo", 11] , 
+    2 : [5 , 32 , "fan"   ,         gp.input(21) , "servo", 31] , 
+    3 : [7 , 33 , "water_pump" ,    gp.input(7) , "servo", 35] ,
+    4 : [8 , 38 , "fan" ,           gp.input(38) , "relay", None ] ,
+    5 : [10, 40 , "fan" ,           gp.input(40) , "relay", None ] ,
+}
+
 @api_view(["POST"])
 def changeDeviceState(request , *args ,**kwargs):
     response = {
@@ -25,6 +33,7 @@ def changeDeviceState(request , *args ,**kwargs):
         Authorization = None
     if not Authorization :
         response["errors"] = ["Please provide authentication details"]
+        response["success"]  = False
         return Response(response)
     try :
         authorization_token = Authorization.split(" ")[1].strip().lstrip().rstrip()
@@ -32,12 +41,14 @@ def changeDeviceState(request , *args ,**kwargs):
         authorization_token = None
     if not authorization_token:
         response["errors"] = ["Token format Invalid !"]
+        response["success"]  = False
         return Response(response)
     if authorization_token != BIOS_TOKEN :
         response["success"] = False
         response["errors"] = {
             "Authentication Error" : ["You are not allowed to access the api request !"]
             }
+        response["success"]  = False
         return Response(response)
     print(f"The value of button number is : {button_number}")
     print(f"The value of state change value is : {state_change_value}")
@@ -117,6 +128,7 @@ def userLoginPage(request , *args , **kwargs) :
                     "Please provide authentication credentials !" ,
                 ]
             }
+            response["success"]  = False
             return Response(response)
         authorization = headers["Authorization"]
         if not authorization : 
@@ -125,6 +137,7 @@ def userLoginPage(request , *args , **kwargs) :
                     "Please provide authentication credentials !" ,
                 ]
             }
+            response["success"]  = False
             return Response(response)
         auth_token = authorization.split(" ")
         if len(auth_token) != 2 : 
@@ -133,6 +146,7 @@ def userLoginPage(request , *args , **kwargs) :
                     "Invalid authentication credentials !" ,
                 ]
             }
+            response["success"]  = False
             return Response(response)
         auth_token = auth_token[1]
         if BIOS_TOKEN != auth_token : 
@@ -141,6 +155,7 @@ def userLoginPage(request , *args , **kwargs) :
                     "You are not allowed to access theh page !" ,
                 ]
             }
+            response["success"]  = False
             return Response(response)
         
 
@@ -162,3 +177,19 @@ def userLoginPage(request , *args , **kwargs) :
                 "method_not_allowed" : "Other methods are not allowed !"
             }
         )
+
+@api_view(["GET"])
+def checkDeviceStatus(request , *args , **kwargs):
+    button_number = int(request.GET.get("button_number"))
+    state = None
+    for device in devices :
+        if button_number == devices[device][1] :
+            if devices[device][4] == "servo" :
+                state = gp.input(devices[device][5])
+            else :
+                state = gp.input(devices[device][1])
+    return Response(
+        {
+            "state" : int(state) ,
+        }
+    )

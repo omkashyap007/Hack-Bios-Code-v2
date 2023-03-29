@@ -184,9 +184,15 @@ input:checked + .slider:before {
       console.log("The socket is null !") ; 
     }
   }
-    var ws_path = "ws://" + window.location.host +"/" ; 
+  console.log(window.location.protocol)
+  if (window.location.protocol == "http:" ){
+    var ws_path = "ws://" + window.location.host +"/";
     var socket = new WebSocket(ws_path) ; 
-
+    }
+   else {
+       var ws_path = "wss://"+window.location.host+"/" ; 
+       var socket = new WebSocket(ws_path) ; 
+   }
     socket.onopen = function(event) { 
       console.log("Socket is connected now !") ; 
       socket.send(

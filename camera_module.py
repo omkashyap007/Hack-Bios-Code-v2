@@ -4,10 +4,7 @@ import os
 import mediapipe as mp
 import math
 import requests
-import picamera
 import switches as sw
-
-
 devices = sw.devices
 
 class handDetector():
@@ -87,7 +84,7 @@ while True:
         
         cv2.imshow("Image", img)
         cv2.waitKey(1)
-        time.sleep(0.5) 
+        time.sleep(0.8) 
         if len(lmList) != 0:
             fingers = []
 
@@ -131,6 +128,7 @@ while True:
             if length <20 :
                 
                 print("Switch is on the new mode!")
+                
                 if number_of_finger in [1,2,3]:
                     url="http://192.168.137.226:8080/api/change-servo-device-state/" 
                 else:
@@ -138,16 +136,18 @@ while True:
                 button_number = int(devices[number_of_finger][1])
                 state_change_value = 1 if devices[number_of_finger][3]==0 else 0
                 
+                state_url="http://192.168.137.226:8080/api/check-device-status/" 
+                state = dict(requests.get(state_url , params = {"button_number" : button_number}).json())["state"]
+                print(f"The state is : {state}")
                 response = requests.post(
                     url = url,  
                     headers = {"Authorization" : "Bearer 7JdKKbw03kLCiop"} ,
-                    data = {"button_number" : button_number , "state_change_value" : state_change_value}
+                    data = {"button_number" : button_number , "state_change_value" : 1 if state == 0 else  0}
                 )
-                print(dict(response.json()))
                 found_finger = False
                 number_of_finger = None
             
-            print(f"The length is : {length}")
+            print(f"The length is : {length} and totalFinger : {number_of_finger}")
                     
                 
             
