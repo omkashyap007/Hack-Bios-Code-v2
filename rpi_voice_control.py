@@ -53,7 +53,7 @@ def split_commands(text):
         print(switch,'  ', change_state)
         
     response = createRequest(switch, change_state)
-    print(dict(response))
+    print(dict(response.json()))
 
 
 def createRequest(button_number, state_change_value):

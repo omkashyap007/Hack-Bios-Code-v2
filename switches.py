@@ -17,11 +17,14 @@ devices = {
     4 : [8 , 38 , "fan" ,           gp.input(38) , "relay", None ] ,
     5 : [10, 40 , "fan" ,           gp.input(40) , "relay", None ] ,
 }
+
+print("Switches.py has been called")
+
 # for device in devices:
 #     gp.setup
-
-for switch in devices:
-    print(f"{switch} : {devices[switch][1]}")
+# 
+# for switch in devices:
+#     print(f"{switch} : {devices[switch][1]}")
 """
 switch id : gpioPin : pinNumber
 switch device : (fan , light ....)

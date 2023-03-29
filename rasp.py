@@ -8,6 +8,7 @@ print(token)
 gp.setmode(gp.BOARD)
 # device ={devicenumber : [commandpin, executerpin, device name, current state, executer type]}
 
+print("FIRING UP RASP.PY")
 
 devices = sw.devices
 for device in devices.values():
@@ -54,7 +55,7 @@ def toggleServo(device):
     state = gp.input(led_pin)
     gp.output(led_pin, int(not state))
     response = requests.post(
-            url = "http://192.168.137.192:8080/api/change-servo-device-state/" ,
+            url = "http://localhost:8080/api/change-servo-device-state/" ,
             headers = {"Authorization" : f"Bearer {token}"} ,
             data = {"button_number" : button_number , "state_change_value" : int(not state) } , 
         )
@@ -81,49 +82,44 @@ print(gp.input(devices[1][1]), devices[1][3])
 
 
 
-try:
-    while True :
-        # check if current state of relay != last state as :
-            # chck if the input button is pressed
-                # if pressed then toggle
-            # change last stae to current
-        
-        i=1		#device id
-        if gp.input(devices[i][0]) != last_state[i]:
-            print("waiting for button to be released")
-            if gp.input(devices[i][0]) == 1:
-                toggleServo(devices[i])
-            last_state[i] = abs(1-last_state[i])
-        
-        i=2
-        if gp.input(devices[i][0]) != last_state[i]:
-            print("waiting for button to be released")
-            if gp.input(devices[i][0]) == 1:
-                toggleServo(devices[i])
-            last_state[i] = abs(1-last_state[i])
-        
-        i=3
-        if gp.input(devices[i][0]) != last_state[i]:
-            print("waiting for button to be released")
-            if gp.input(devices[i][0]) == 1:
-                toggleServo(devices[i])
-            last_state[i] = abs(1-last_state[i])
-            
-        i=4
-#         if gp.input(devices[i][0]) == 0:
-#             if gp.input(devices[i][0]) != last_state[i]:
-#                 print("Toggle Switch Is Active") 
-#                 toggleRelay(devices[i][1], True,0)
-#             last_state[i] = abs(1-last_state[i])
-        
-        i=5
-        if gp.input(devices[i][0]) != last_state[i]:
-            print("waiting for button to be released")
-            if gp.input(devices[i][0]) == 1:
-                toggleRelay(devices[i][1])
-            last_state[i] = abs(1-last_state[i])
-#         
+while True :
+    # check if current state of relay != last state as :
+        # chck if the input button is pressed
+            # if pressed then toggle
+        # change last stae to current
     
-finally:
-    gp.cleanup()
-    print("CleanUp Complete")
+    i=1		#device id
+    if gp.input(devices[i][0]) != last_state[i]:
+        print("waiting for button to be released")
+        if gp.input(devices[i][0]) == 1:
+            toggleServo(devices[i])
+        last_state[i] = abs(1-last_state[i])
+    
+    i=2
+    if gp.input(devices[i][0]) != last_state[i]:
+        print("waiting for button to be released")
+        if gp.input(devices[i][0]) == 1:
+            toggleServo(devices[i])
+        last_state[i] = abs(1-last_state[i])
+    
+    i=3
+    if gp.input(devices[i][0]) != last_state[i]:
+        print("waiting for button to be released")
+        if gp.input(devices[i][0]) == 1:
+            toggleServo(devices[i])
+        last_state[i] = abs(1-last_state[i])
+        
+    i=4
+#     if gp.input(devices[i][0]) == 0:
+#         if gp.input(devices[i][0]) != last_state[i]:
+#             print("Toggle Switch Is Active") 
+#             toggleRelay(devices[i][1], True,0)
+#         last_state[i] = abs(1-last_state[i])
+        
+    i=5
+    if gp.input(devices[i][0]) != last_state[i]:
+        print("waiting for button to be released")
+        if gp.input(devices[i][0]) == 1:
+            toggleRelay(devices[i][1])
+        last_state[i] = abs(1-last_state[i])
+

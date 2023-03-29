@@ -19,8 +19,9 @@ SECRET_KEY = 'django-insecure-#=sgi_vuwf@(zisa4u5r8rgi!rfg#nq0i1g_8^h#@nu7ic-0$(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*","https://7f23-103-90-97-197.in.ngrok.io" , "7f23-103-90-97-197.in.ngrok.io"]
 
+CSRF_TRUSTED_ORIGINGS = ["*" , "https://*.in.ngrok.io" ,"https://7f23-103-90-97-197.in.ngrok.io"]
 
 # Application definition
 
@@ -36,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-]
+    'corsheaders',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -47,7 +49,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
+    
 ROOT_URLCONF = 'HackBios.urls'
 
 TEMPLATES = [
@@ -71,6 +73,8 @@ ASGI_APPLICATION = "HackBios.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+
+CORS_ALLOW_ALL_ORIGIN = True
 
 DATABASES = {
     'default': {
