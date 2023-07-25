@@ -6,6 +6,7 @@ from .gpio_functions import *
 from django.contrib.auth import authenticate
 # from .async_functions import *
 import os
+import json
 
 BIOS_TOKEN = os.environ.get("BIOS_TOKEN").strip().lstrip().rstrip()
 
@@ -23,9 +24,20 @@ def changeDeviceState(request , *args ,**kwargs):
         "data" : None , 
         "errors" : None , 
         "success" : False , 
-    }
-    button_number = int(request.POST.get("button_number"))
-    state_change_value = int(request.POST.get("state_change_value"))
+        }
+    postData = {}
+    received_first_data = list(request.POST.keys())[0]
+    print(f"fiirst dat : {received_first_data}")
+    try :
+        converted_data = json.loads(received_first_data)
+        if type(converted_data) == type({}):
+            postData = converted_data
+    except :
+        for key in request.POST:
+            postData[key] = request.POST.get(key)
+    print(f"This is post data : {postData}")
+    button_number = int(postData.get("button_number"))
+    state_change_value = int(postData.get("state_change_value"))
     print(button_number , state_change_value )
     try:
         Authorization = request.headers.get("Authorization")

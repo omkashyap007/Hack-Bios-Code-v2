@@ -2,9 +2,15 @@ import switches as sw
 import requests
 import os
 import speech_recognition as sr
+
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, message="ALSA *")
+
+
+
 recog = sr.Recognizer()
 devices = sw.devices
-
+timeout_duration=5
 
 # text = "turn on switch 1"
 one = ["1", "one", "on"]
@@ -78,12 +84,22 @@ while True:
     with sr.Microphone() as mic:
         recog.adjust_for_ambient_noise(mic)
         print("Software is listening ... ")
-        audio = recog.listen(mic)
+        audio = recog.listen(mic, timeout=timeout_duration)
         print("Voice captured ...")
 
     try:
-        text = recog.recognize_google(audio)
+        text = recog.recognize_google(audio, lang='en-IN')
         print(text)
         split_commands(text)
+        
+    except sr.UnknownValueError:
+        print("Speech recognition could not understand audio")
+
+    except sr.RequestError as e:
+        print("Could not request results from Google Speech Recognition service; {0}".format(e))
+
+    except sr.WaitTimeoutError:
+        print("Timeout occurred, no speech detected within {0} seconds".format(timeout_duration))
+    
     except Exception as e:
         print("Error occured:" + str(e))
